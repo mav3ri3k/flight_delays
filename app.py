@@ -6,7 +6,7 @@ from utils import Labels
 
 # Load the model
 model = joblib.load("./flight_delay_model.pkl")
-labels = joblib.load("./Labels")
+labels = joblib.load("./Labels.pkl")
 
 st.title("✈️ Flight Delay Predictor")
 st.write("Enter flight and airport details to predict delay status.")
