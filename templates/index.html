@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Flight Delay Predictor</title>
+
+  <!-- Google Font -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+  <!-- Main stylesheet -->
+  <link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='style.css') }}"
+  />
+  <!-- Prevent FOUT -->
+  <style>body { visibility: hidden; }</style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="card">
+      <h1>✈️ Flight Delay Predictor</h1>
+
+      <form id="delayForm" action="{{ url_for('predict') }}" method="post">
+        <div class="grid">
+          {# Preserve carrier selection #}
+          {% set sel_carrier = request.form.get('carrier') %}
+          <label>
+            Carrier Code
+            <select name="carrier" required>
+              {% for c in carriers %}
+              <option
+                value="{{ c }}"
+                {% if c == sel_carrier %}selected{% endif %}
+              >
+                {{ c }}
+              </option>
+              {% endfor %}
+            </select>
+          </label>
+
+          {# Preserve airport selection #}
+          {% set sel_airport = request.form.get('airport') %}
+          <label>
+            Airport Code
+            <select name="airport" required>
+              {% for a in airports %}
+              <option
+                value="{{ a }}"
+                {% if a == sel_airport %}selected{% endif %}
+              >
+                {{ a }}
+              </option>
+              {% endfor %}
+            </select>
+          </label>
+
+          {# Numeric inputs #}
+          {% for name, label, mn, mx, df in [
+            ('month','Month (1–12)',1,12,6),
+            ('arr_flights','Arriving Flights',0,1000,100),
+            ('arr_cancelled','Cancelled Arrivals',0,100,0),
+            ('arr_del15','Arrivals Delayed >15 min',0,100,10),
+            ('arr_diverted','Diverted Arrivals',0,100,0),
+            ('carrier_ct','Carrier Delay Count',0,100,5),
+            ('weather_ct','Weather Delay Count',0,100,3),
+            ('nas_ct','NAS Delay Count',0,100,4),
+            ('security_ct','Security Delay Count',0,100,0),
+            ('late_aircraft_ct','Late Aircraft Delay Count',0,100,6)
+          ] %}
+          <label>
+            {{ label }}
+            <input
+              type="number"
+              name="{{ name }}"
+              min="{{ mn }}"
+              max="{{ mx }}"
+              value="{{ request.form.get(name, df) }}"
+              required
+            />
+          </label>
+          {% endfor %}
+        </div>
+
+        <button type="submit" class="btn">Predict Delay</button>
+      </form>
+
+      {% if result %}
+      <div class="result {% if result == 'On Time' %}on-time{% else %}delayed{% endif %}">
+        {% if result == 'On Time' %}
+          🟢 On Time
+        {% else %}
+          🔴 Delayed
+        {% endif %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Reveal once CSS & font loaded -->
+  <script>document.body.style.visibility = 'visible';</script>
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
