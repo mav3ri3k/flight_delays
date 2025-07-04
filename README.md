@@ -26,7 +26,3 @@ File: `model.ipynb`
 
 ### Application Building
 File: `app.py`
-
-> [!TIP]
-> To run use `uv run streamlit run app.py`
-
